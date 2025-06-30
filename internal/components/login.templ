@@ -1,0 +1,25 @@
+package components
+
+templ Login() {
+	<div class="login-container">
+		<h2>Log in</h2>
+		<div id="login-messages"></div>
+		<form
+			hx-post="/auth/signin"
+			hx-target="#login-messages"
+			hx-swap="innerHTML"
+		>
+			<label for="email">Email</label>
+			<input type="email" name="email" id="email"/>
+			<label for="password">Password</label>
+			<input type="password" name="password" id="password"/>
+			<button type="submit">Log in</button>
+		</form>
+	</div>
+}
+
+templ LoginResponse(success bool, message string) {
+	if !success {
+		<div>Error: { message }</div>
+	}
+}
