@@ -19,7 +19,7 @@ type database struct {
 }
 
 // Create and connect to mysql db
-func Init() {
+func Init() *sql.DB {
 	var dbVariables *database = getVariables()
 
 	connString := fmt.Sprintf("%s:%s@tcp(%s)/%s", dbVariables.User, dbVariables.Password, dbVariables.Host, dbVariables.Name)
@@ -28,8 +28,6 @@ func Init() {
 	if err != nil {
 		log.Fatalf("Error %s when opening DB\n", err)
 	}
-
-	defer db.Close()
 
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelFunc()
@@ -48,9 +46,10 @@ func Init() {
 
 	createSchema(db)
 
-	log.Print("Schema initializated")
+	return db
 }
 
+// TODO: Add unique and validations
 func createSchema(db *sql.DB) error {
 	tables := []string{
 		`
@@ -59,9 +58,9 @@ func createSchema(db *sql.DB) error {
 			middle_names VARCHAR(100) NOT NULL,
 			paternal_surname VARCHAR(100) NOT NULL,
 			maternal_surname VARCHAR(100) DEFAULT NULL,
-			personal_id VARCHAR(50) DEFAULT NULL,
+			personal_id CHAR(100) DEFAULT NULL,
 			email VARCHAR(150) NOT NULL,
-			hash VARCHAR(255) NOT NULL,
+			hash CHAR(255) NOT NULL,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 		);
@@ -117,6 +116,16 @@ func createSchema(db *sql.DB) error {
 			FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE
 		);
 		`,
+		`
+		CREATE TABLE IF NOT EXISTS sessions (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			uuid CHAR(255) NOT NULL,
+			user_id INT NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+		);
+		`,
 	}
 
 	for _, table := range tables {
@@ -127,6 +136,7 @@ func createSchema(db *sql.DB) error {
 
 		stmt.Exec()
 	}
+
 	return nil
 }
 
