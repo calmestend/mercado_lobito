@@ -1,0 +1,27 @@
+package components
+
+templ Signup() {
+	<div class="signup-container">
+		<h2>Sign Up</h2>
+		<div id="signup-messages"></div>
+		<form
+			hx-post="/auth/signup"
+			hx-target="#signup-messages"
+			hx-swap="innerHTML"
+		>
+			<label for="email">Email</label>
+			<input type="email" name="email" id="email"/>
+			<label for="password">Password</label>
+			<input type="password" name="password" id="password"/>
+			<label for="confirm_password">Confirm Password</label>
+			<input type="password" name="confirm_password" id="confirm_password"/>
+			<button type="submit">Sign up</button>
+		</form>
+	</div>
+}
+
+templ SignupResponse(success bool, message string) {
+	if !success {
+		<div>Error: { message }</div>
+	}
+}
