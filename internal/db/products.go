@@ -1,11 +1,27 @@
 package db
 
+import "database/sql"
+
 type Product struct {
-	id          int
-	title       string
-	price       float32
-	stock       int
-	business_id int
-	created_at  int
-	update_at   int
+	ID         int
+	Title      string
+	Price      float64
+	Stock      int
+	BusinessID int
+}
+
+func (p *Product) Set(db *sql.DB) error {
+	return nil
+}
+
+func (p *Product) Get(db *sql.DB) error {
+	return nil
+}
+
+func (p *Product) Delete(db *sql.DB) error {
+	return nil
+}
+
+func (p *Product) Update(db *sql.DB) error {
+	return nil
 }

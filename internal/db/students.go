@@ -1,10 +1,23 @@
 package db
 
+import "database/sql"
+
 type Student struct {
-	id          int
-	grade       string
-	class_group string
-	User
-	created_at int
-	update_at  int
+	ID         string
+	Grade      string
+	ClassGroup string
+	UserID     int
+}
+
+func (s *Student) Set(db *sql.DB) error {
+	return nil
+}
+func (s *Student) Get(db *sql.DB) error {
+	return nil
+}
+func (s *Student) Delete(db *sql.DB) error {
+	return nil
+}
+func (s *Student) Update(db *sql.DB) error {
+	return nil
 }

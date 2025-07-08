@@ -1,7 +1,15 @@
 package main
 
-import "log"
+import (
+	"github.com/calmestend/mercado_lobito/internal/auth"
+	"github.com/calmestend/mercado_lobito/internal/db"
+	"github.com/calmestend/mercado_lobito/internal/router"
+	"github.com/calmestend/mercado_lobito/pkg/env"
+)
 
 func main() {
-	log.Print("Hola desde mercado lobito")
+	env.Init()
+	dbConn := db.Init()
+	auth.SetDBConnection(dbConn)
+	router.Init()
 }
