@@ -1,0 +1,23 @@
+package views
+
+import "github.com/calmestend/mercado_lobito/internal/components"
+
+templ OrganizationPassport() {
+	<h1>Organization Name(?)</h1>
+	<div>
+		<button>
+			<img src="matricula.jpg" alt=""/>
+			<p>Position</p>
+			<p>Name</p>
+		</button>
+		<button>
+			<img src="matricula.jpg" alt=""/>
+			<p>Position</p>
+			<p>Name</p>
+		</button>
+	</div>
+	@components.Passport()
+	<div>
+		<button>Download Passport</button>
+	</div>
+}

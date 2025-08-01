@@ -3,7 +3,10 @@ package auth
 import (
 	"database/sql"
 	"errors"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -15,18 +18,14 @@ import (
 
 var dbConn *sql.DB
 
-// SetDBConnection establece la conexión a la base de datos
+const uploadDir = "./uploads"
+
 func SetDBConnection(database *sql.DB) {
 	dbConn = database
 }
 
-func generateSecureToken() string {
-	return uuid.NewString()
-}
-
-// CreateSession crea una nueva sesión en la base de datos
 func CreateSession(userID int) (string, error) {
-	uuid := generateSecureToken()
+	uuid := uuid.NewString()
 
 	session := db.Session{
 		UUID:   uuid,
@@ -41,7 +40,6 @@ func CreateSession(userID int) (string, error) {
 	return uuid, nil
 }
 
-// GetSession obtiene una sesión válida desde la base de datos
 func GetSession(uuid string) (*db.Session, error) {
 	session := db.Session{
 		UUID: uuid,
@@ -55,7 +53,6 @@ func GetSession(uuid string) (*db.Session, error) {
 	return &session, nil
 }
 
-// DeleteSession elimina una sesión de la base de datos
 func DeleteSession(uuid string) error {
 	session := db.Session{
 		UUID: uuid,
@@ -64,7 +61,6 @@ func DeleteSession(uuid string) error {
 	return session.Delete(dbConn)
 }
 
-// IsAuthenticated verifica si un token es válido
 func IsAuthenticated(r *http.Request) bool {
 	cookie, err := r.Cookie("session")
 	if err != nil {
@@ -75,59 +71,6 @@ func IsAuthenticated(r *http.Request) bool {
 	return err == nil
 }
 
-// GetUserByEmail obtiene un usuario por email
-func GetUserByEmail(email string) (*db.User, error) {
-	stmt := `
-		SELECT id, middle_names, paternal_surname, maternal_surname, personal_id, email, hash
-		FROM users
-		WHERE email = ?
-	`
-	row := dbConn.QueryRow(stmt, email)
-
-	var user db.User
-	err := row.Scan(&user.ID, &user.MiddleNames, &user.PaternalSurname, &user.MaternalSurname, &user.PersonalID, &user.Email, &user.Hash)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.New("user not found")
-		}
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-// CreateUser crea un nuevo usuario en la base de datos
-func CreateUser(email, password string) (*db.User, error) {
-	// Verificar si el usuario ya existe
-	_, err := GetUserByEmail(email)
-	if err == nil {
-		return nil, errors.New("user already exists")
-	}
-
-	// Hash de la contraseña
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-
-	user := db.User{
-		MiddleNames:     "", // Campo vacío
-		PaternalSurname: "", // Campo vacío
-		MaternalSurname: "", // Campo vacío
-		PersonalID:      0,  // Campo vacío/null
-		Email:           email,
-		Hash:            string(hashedPassword),
-	}
-
-	err = user.Set(dbConn)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-// VerifyPassword verifica si la contraseña es correcta
 func VerifyPassword(hashedPassword, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err == nil
@@ -138,7 +81,6 @@ type Credentials struct {
 	Password string `json:"password"`
 }
 
-// Signin maneja el inicio de sesión
 func Signin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -152,96 +94,175 @@ func Signin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := r.FormValue("email")
+	studentID := r.FormValue("student_id")
 	password := r.FormValue("password")
 
-	// Validar campos vacíos
-	if email == "" || password == "" {
-		component := components.LoginResponse(false, "Email and password are required")
+	if studentID == "" || password == "" {
+		component := components.LoginResponse(false, "Student ID and password are required")
 		component.Render(r.Context(), w)
 		return
 	}
 
-	// Validar formato de email básico
-	if !strings.Contains(email, "@") {
-		component := components.LoginResponse(false, "Please enter a valid email")
-		component.Render(r.Context(), w)
-		return
+	s := db.Student{
+		ID: studentID,
 	}
 
-	// Buscar usuario en la base de datos
-	user, err := GetUserByEmail(email)
+	err = s.GetByID(dbConn)
 	if err != nil {
-		component := components.LoginResponse(false, "Invalid credentials")
+		component := components.LoginResponse(false, "Invalid Credentials")
 		component.Render(r.Context(), w)
 		return
 	}
 
-	// Verificar contraseña
-	if !VerifyPassword(user.Hash, password) {
-		component := components.LoginResponse(false, "Invalid credentials")
+	u := db.User{
+		ID: s.UserID,
+	}
+
+	err = u.GetByID(dbConn)
+	if err != nil {
+		component := components.LoginResponse(false, "Invalid Credentials")
 		component.Render(r.Context(), w)
 		return
 	}
 
-	// Crear sesión
-	token, err := CreateSession(user.ID)
+	if !VerifyPassword(u.Hash, password) {
+		component := components.LoginResponse(false, "Invalid Credentials")
+		component.Render(r.Context(), w)
+		return
+	}
+
+	token, err := CreateSession(u.ID)
 	if err != nil {
 		component := components.LoginResponse(false, "Error creating session")
 		component.Render(r.Context(), w)
 		return
 	}
 
-	// Establecer cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session",
 		Value:    token,
 		Expires:  time.Now().Add(24 * time.Hour),
 		HttpOnly: false,
-		Secure:   false, // Cambiar a true en producción con HTTPS
+		Secure:   false,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
 	})
 
-	// Redirigir usando HTMX
-	w.Header().Set("HX-Redirect", "/dashboard")
+	w.Header().Set("HX-Redirect", "/")
 	w.WriteHeader(http.StatusOK)
 }
 
-// Signup maneja el registro de usuarios
 func Signup(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	err := r.ParseForm()
+	err := r.ParseMultipartForm(5 << 20) // 5 MB
 	if err != nil {
 		component := components.SignupResponse(false, "Error processing form")
 		component.Render(r.Context(), w)
 		return
 	}
 
-	email := r.FormValue("email")
+	defer r.MultipartForm.RemoveAll()
+	defer r.Body.Close()
+
+	u := db.User{
+		MiddleNames:     r.FormValue("middle_names"),
+		PaternalSurname: r.FormValue("paternal_surname"),
+		MaternalSurname: r.FormValue("maternal_surname"),
+		Email:           r.FormValue("email"),
+	}
+
+	s := db.Student{
+		ID:         r.FormValue("student_id"),
+		Grade:      "",
+		ClassGroup: "",
+	}
+
 	password := r.FormValue("password")
 	confirmPassword := r.FormValue("confirm_password")
 
-	// Validar campos vacíos
-	if email == "" || password == "" || confirmPassword == "" {
+	// --- File Upload Logic ---
+	file, _, err := r.FormFile("file") // "file" is the name attribute from your <input type="file">
+	if err != nil {
+		if err == http.ErrMissingFile {
+			component := components.SignupResponse(false, "Profile photo is required")
+			component.Render(r.Context(), w)
+			return
+		} else {
+			component := components.SignupResponse(false, "Error retrieving profile photo: "+err.Error())
+			component.Render(r.Context(), w)
+			return
+		}
+	} else {
+		defer file.Close()
+
+		// Ensure the upload directory exists
+		if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+			err = os.MkdirAll(uploadDir, 0755) // Create with read/write/execute permissions for owner, read/execute for group/others
+			if err != nil {
+				component := components.SignupResponse(false, "Error creating upload directory: "+err.Error())
+				component.Render(r.Context(), w)
+				return
+			}
+		}
+
+		// Use the student ID for the filename
+		filename := s.ID + ".jpg"
+
+		// Construct the full path to save the file
+		filePath := filepath.Join(uploadDir, filename)
+
+		// Create the new file on the server
+		dst, err := os.Create(filePath)
+		if err != nil {
+			component := components.SignupResponse(false, "Error creating file on server: "+err.Error())
+			component.Render(r.Context(), w)
+			return
+		}
+		defer dst.Close() // Close the destination file
+
+		// Copy the uploaded file's content to the new file
+		if _, err := io.Copy(dst, file); err != nil {
+			component := components.SignupResponse(false, "Error saving profile photo: "+err.Error())
+			component.Render(r.Context(), w)
+			return
+		}
+	}
+
+	// Empty values validation
+	if s.ID == "" || u.MiddleNames == "" || u.PaternalSurname == "" || u.MaternalSurname == "" || u.Email == "" || password == "" || confirmPassword == "" {
 		component := components.SignupResponse(false, "All fields are required")
 		component.Render(r.Context(), w)
 		return
 	}
 
-	// Validar que las contraseñas coincidan
 	if password != confirmPassword {
 		component := components.SignupResponse(false, "Passwords don't match")
 		component.Render(r.Context(), w)
 		return
 	}
 
-	// Crear usuario
-	user, err := CreateUser(email, password)
+	// Create User
+	err = u.GetByEmail(dbConn)
+	if err != nil && !strings.Contains(err.Error(), "user not found") {
+		component := components.SignupResponse(false, "Error creating user")
+		component.Render(r.Context(), w)
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		component := components.SignupResponse(false, "Error creating user")
+		component.Render(r.Context(), w)
+		return
+	}
+
+	u.Hash = string(hashedPassword)
+
+	err = u.Set(dbConn)
 	if err != nil {
 		if strings.Contains(err.Error(), "already exists") {
 			component := components.SignupResponse(false, "User already exists")
@@ -253,15 +274,28 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Crear sesión automáticamente después del registro
-	token, err := CreateSession(user.ID)
+	s.UserID = u.ID
+	err = s.Set(dbConn)
+	if err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			component := components.SignupResponse(false, "Student already exists")
+			component.Render(r.Context(), w)
+		} else {
+			component := components.SignupResponse(false, "Error creating student")
+			component.Render(r.Context(), w)
+		}
+		return
+	}
+
+	// Create session
+	token, err := CreateSession(u.ID)
 	if err != nil {
 		component := components.SignupResponse(false, "User created but error logging in")
 		component.Render(r.Context(), w)
 		return
 	}
 
-	// Establecer cookie
+	// Set cookies
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session",
 		Value:    token,
@@ -272,12 +306,10 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 	})
 
-	// Redirigir usando HTMX
 	w.Header().Set("HX-Redirect", "/")
 	w.WriteHeader(http.StatusOK)
 }
 
-// GetSessionFromRequest obtiene la sesión desde la request
 func GetSessionFromRequest(r *http.Request) (*db.Session, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
@@ -287,31 +319,13 @@ func GetSessionFromRequest(r *http.Request) (*db.Session, error) {
 	return GetSession(cookie.Value)
 }
 
-// GetUserFromRequest obtiene el usuario desde la request
-func GetUserFromRequest(r *http.Request) (*db.User, error) {
-	session, err := GetSessionFromRequest(r)
-	if err != nil {
-		return nil, err
-	}
-
-	user := db.User{ID: session.UserID}
-	err = user.Get(dbConn)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-// Logout maneja el cierre de sesión
 func Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session")
 	if err == nil {
-		// Eliminar sesión de la base de datos
 		DeleteSession(cookie.Value)
 	}
 
-	// Eliminar cookie del navegador
+	// Delete Cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session",
 		Value:    "",
@@ -322,12 +336,9 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 	})
 
-	// Redirigir usando HTMX
-	w.Header().Set("HX-Redirect", "/")
-	w.WriteHeader(http.StatusOK)
+	http.Redirect(w, r, "/auth/login", http.StatusFound)
 }
 
-// AuthMiddleware middleware para proteger rutas
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := GetSessionFromRequest(r)
@@ -336,10 +347,8 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		// Verificar que la sesión aún existe en la base de datos
 		_, err = GetSession(session.UUID)
 		if err != nil {
-			// Limpiar cookie inválida
 			http.SetCookie(w, &http.Cookie{
 				Name:     "session",
 				Value:    "",

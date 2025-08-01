@@ -7,12 +7,23 @@ import (
 	"github.com/calmestend/mercado_lobito/internal/handlers"
 )
 
+// @TODO: Add documentation
+// @TODO: Add inputs validation (validator library can be used)
+// @TODO: Add stylesheets
+// @TODO: Add Products CRUD
+// @TODO: Add Business CRUD
+// @TODO: Add Students CRUD
+// @TODO: Add Users CRUD
 func Init() {
 	// Render HTML
 	http.HandleFunc("/", handlers.Home)
-	http.HandleFunc("/dashboard", auth.AuthMiddleware(handlers.Home))
-	http.HandleFunc("/profile", auth.AuthMiddleware(handlers.Home))
-
+	http.HandleFunc("/profile", auth.AuthMiddleware(handlers.Profile))
+	http.HandleFunc("/profile/config", auth.AuthMiddleware(handlers.Settings))
+	http.HandleFunc("/organization", auth.AuthMiddleware(handlers.Organization))
+	// Only Available if you have an organization
+	http.HandleFunc("/organization/products", auth.AuthMiddleware(handlers.OrganizationProducts))
+	http.HandleFunc("/organization/passport", auth.AuthMiddleware(handlers.OrganizationPassport))
+	// Auth
 	http.HandleFunc("/auth/login", handlers.Login)
 	http.HandleFunc("/auth/register", handlers.Register)
 

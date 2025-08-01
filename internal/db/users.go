@@ -38,13 +38,32 @@ func (u *User) Set(db *sql.DB) error {
 	return nil
 }
 
-func (u *User) Get(db *sql.DB) error {
+func (u *User) GetByID(db *sql.DB) error {
 	stmt := `
 		SELECT id, middle_names, paternal_surname, maternal_surname, personal_id, email, hash
 		FROM users
 		WHERE id = ?
 	`
 	row := db.QueryRow(stmt, u.ID)
+	err := row.Scan(&u.ID, &u.MiddleNames, &u.PaternalSurname, &u.MaternalSurname, &u.PersonalID, &u.Email, &u.Hash)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("user not found")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (u *User) GetByEmail(db *sql.DB) error {
+	stmt := `
+		SELECT id, middle_names, paternal_surname, maternal_surname, personal_id, email, hash
+		FROM users
+		WHERE email = ?
+	`
+
+	row := db.QueryRow(stmt, u.Email)
 	err := row.Scan(&u.ID, &u.MiddleNames, &u.PaternalSurname, &u.MaternalSurname, &u.PersonalID, &u.Email, &u.Hash)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

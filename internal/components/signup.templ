@@ -5,10 +5,22 @@ templ Signup() {
 		<h2>Sign Up</h2>
 		<div id="signup-messages"></div>
 		<form
+			id="signup_form"
 			hx-post="/auth/signup"
 			hx-target="#signup-messages"
 			hx-swap="innerHTML"
+			hx-encoding="multipart/form-data"
 		>
+			<label for="file">Profile Photo</label>
+			<input type="file" accept="image/*" name="file" id="file"/>
+			<label for="student_id">Student ID</label>
+			<input type="number" name="student_id" id="student_id"/>
+			<label for="middle_names">Names</label>
+			<input type="text" name="middle_names" id="middle_names"/>
+			<label for="paternal_surname">Paternal Surname</label>
+			<input type="text" name="paternal_surname" id="paternal_surname"/>
+			<label for="maternal_surname">Maternal Surname</label>
+			<input type="text" name="maternal_surname" id="maternal_surname"/>
 			<label for="email">Email</label>
 			<input type="email" name="email" id="email"/>
 			<label for="password">Password</label>
