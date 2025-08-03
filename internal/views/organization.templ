@@ -1,39 +1,41 @@
 package views
 
 templ Organization() {
-	<aside>
-		<div>
-			<p>Puesto</p>
-			<p>Nombre</p>
-		</div>
-		<div>
-			<p>Puesto</p>
-			<p>Nombre</p>
-		</div>
-		<div>
-			<p>+</p>
-			<p>Add more colaborators</p>
-		</div>
-	</aside>
-	<section>
-		<p>Colaborador</p>
-		<img src="matricula.jpg" alt=""/>
+<aside>
+	<div>
+		<p>Puesto</p>
 		<p>Nombre</p>
-		<button>Interno</button>
-		<button>Externo</button>
-		<form>
-			<label for="file">Profile Photo</label>
-			<input type="file" accept="image/*" name="file" id="file"/>
-			<label for="student_id">Student ID</label>
-			<input type="number" name="student_id" id="student_id"/>
-			<label for="middle_names">Names</label>
-			<input type="text" name="middle_names" id="middle_names"/>
-			<label for="paternal_surname">Paternal Surname</label>
-			<input type="text" name="paternal_surname" id="paternal_surname"/>
-			<label for="maternal_surname">Maternal Surname</label>
-			<input type="text" name="maternal_surname" id="maternal_surname"/>
-			<button type="submit">Create/Update Information</button>
-		</form>
-		<button>Download your passport</button>
-	</section>
+	</div>
+	<div>
+		<p>Puesto</p>
+		<p>Nombre</p>
+	</div>
+	<div>
+		<p>+</p>
+		<p>Add more colaborators</p>
+	</div>
+</aside>
+<section>
+	<p>Colaborador</p>
+	<img src="matricula.jpg" alt="" />
+	<p>Nombre</p>
+	<button>Interno</button>
+	<button>Externo</button>
+	<div id="messages"></div>
+	<form id="signup_form" hx-post="/organization" hx-target="#messages" hx-swap="innerHTML"
+		hx-encoding="multipart/form-data">
+		<label for="file">Profile Photo</label>
+		<input type="file" accept="image/*" name="file" id="file" />
+		<label for="student_id">Student ID</label>
+		<input type="number" name="student_id" id="student_id" />
+		<label for="middle_names">Names</label>
+		<input type="text" name="middle_names" id="middle_names" />
+		<label for="paternal_surname">Paternal Surname</label>
+		<input type="text" name="paternal_surname" id="paternal_surname" />
+		<label for="maternal_surname">Maternal Surname</label>
+		<input type="text" name="maternal_surname" id="maternal_surname" />
+		<button type="submit">Create/Update Information</button>
+	</form>
+	<button>Download your passport</button>
+</section>
 }

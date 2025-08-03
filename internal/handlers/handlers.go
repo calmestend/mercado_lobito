@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/calmestend/mercado_lobito/internal/auth"
 	"github.com/calmestend/mercado_lobito/internal/components"
+	"github.com/calmestend/mercado_lobito/internal/db"
 	"github.com/calmestend/mercado_lobito/internal/views"
 )
 
@@ -49,9 +51,30 @@ func OrganizationProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func Settings(w http.ResponseWriter, r *http.Request) {
+	dbConn := db.Init()
 	isAuth := auth.IsAuthenticated(r)
 
-	settingsComponent := views.Settings()
+	sess, err := auth.GetSessionFromRequest(r)
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	student := db.Student{UserID: sess.UserID}
+	if err := student.GetByUserID(dbConn); err != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	business := db.Business{OwnerID: student.ID}
+	err = business.GetByOwnerID(dbConn)
+
+	settingsComponent := views.Settings(
+		fmt.Sprintf("/uploads/%s.jpg", student.ID),
+		business.Name,
+		business.Type,
+		business.Description,
+	)
 	page := views.Index(settingsComponent, isAuth)
 	page.Render(r.Context(), w)
 }

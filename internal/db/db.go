@@ -85,12 +85,12 @@ func createSchema(db *sql.DB) error {
 			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 		);
 		`,
-		//@TODO: Add category/type of business
-		//@TODO: Add category/type of business table
 		`
 		CREATE TABLE IF NOT EXISTS businesses (
 			id INT AUTO_INCREMENT PRIMARY KEY,
 			name VARCHAR(100) NOT NULL,
+			type VARCHAR(100) DEFAULT NULL,
+			description TEXT DEFAULT NULL,
 			owner_id CHAR(10),
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

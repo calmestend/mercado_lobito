@@ -28,6 +28,7 @@ func (s *Student) Set(db *sql.DB) error {
 
 	return nil
 }
+
 func (s *Student) GetByID(db *sql.DB) error {
 	stmt := `
 		SELECT id, grade, class_group, user_id FROM students WHERE id = ?
@@ -45,6 +46,21 @@ func (s *Student) GetByID(db *sql.DB) error {
 }
 
 func (s *Student) Update(db *sql.DB) error {
+	return nil
+}
+
+func (s *Student) GetByUserID(db *sql.DB) error {
+	stmt := `
+		SELECT id, grade, class_group, user_id FROM students WHERE user_id = ?
+	`
+	row := db.QueryRow(stmt, s.UserID)
+	err := row.Scan(&s.ID, &s.Grade, &s.ClassGroup, &s.UserID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("student not found")
+		}
+		return err
+	}
 	return nil
 }
 
