@@ -8,6 +8,8 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "github.com/calmestend/mercado_lobito/internal/db"
+
 func Organization() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,9 +31,152 @@ func Organization() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<aside><div><p>Puesto</p><p>Nombre</p></div><div><p>Puesto</p><p>Nombre</p></div><div><p>+</p><p>Add more colaborators</p></div></aside><section><p>Colaborador</p><img src=\"matricula.jpg\" alt=\"\"><p>Nombre</p><button>Interno</button> <button>Externo</button><div id=\"messages\"></div><form id=\"signup_form\" hx-post=\"/organization\" hx-target=\"#messages\" hx-swap=\"innerHTML\" hx-encoding=\"multipart/form-data\"><label for=\"file\">Profile Photo</label> <input type=\"file\" accept=\"image/*\" name=\"file\" id=\"file\"> <label for=\"student_id\">Student ID</label> <input type=\"number\" name=\"student_id\" id=\"student_id\"> <label for=\"middle_names\">Names</label> <input type=\"text\" name=\"middle_names\" id=\"middle_names\"> <label for=\"paternal_surname\">Paternal Surname</label> <input type=\"text\" name=\"paternal_surname\" id=\"paternal_surname\"> <label for=\"maternal_surname\">Maternal Surname</label> <input type=\"text\" name=\"maternal_surname\" id=\"maternal_surname\"> <button type=\"submit\">Create/Update Information</button></form><button>Download your passport</button></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<aside><div id=\"collaborators-list\" hx-get=\"/api/business/collaborators\" hx-trigger=\"load\" hx-swap=\"innerHTML\"></div></aside><section><h2>Nuevo colaborador</h2><div id=\"messages\"></div><form id=\"collaborator-form\" hx-post=\"/api/business/collaborators\" hx-target=\"#messages\" hx-swap=\"innerHTML\" hx-encoding=\"multipart/form-data\"><fieldset><input type=\"radio\" id=\"intern\" name=\"isIntern\" value=\"true\" required checked onchange=\"toggleFields()\"> <label for=\"intern\">Interno</label> <input type=\"radio\" id=\"external\" name=\"isIntern\" value=\"false\" onchange=\"toggleFields()\"> <label for=\"external\">Externo</label></fieldset><label for=\"file\">Foto de perfil</label> <input type=\"file\" accept=\"image/*\" name=\"file\" id=\"file\" required> <label for=\"middle_names\">Nombres</label> <input type=\"text\" name=\"middle_names\" id=\"middle_names\" required> <label for=\"paternal_surname\">Apellido paterno</label> <input type=\"text\" name=\"paternal_surname\" id=\"paternal_surname\" required> <label for=\"maternal_surname\">Apellido materno</label> <input type=\"text\" name=\"maternal_surname\" id=\"maternal_surname\" required> <label for=\"email\">Correo</label> <input type=\"email\" name=\"email\" id=\"email\" required><div id=\"intern-fields\"><label for=\"grade\">Grado</label> <input type=\"text\" name=\"grade\" id=\"grade\"> <label for=\"class_group\">Grupo</label> <input type=\"text\" name=\"class_group\" id=\"class_group\"> <label for=\"student_id\">Student ID</label> <input type=\"text\" name=\"student_id\" id=\"student_id\"></div><div id=\"external-fields\" style=\"display: none;\"><label for=\"personal_id\">ID Personal</label> <input type=\"text\" name=\"personal_id\" id=\"personal_id\"></div><button type=\"submit\">Crear/Actualizar colaborador</button></form><form method=\"get\" action=\"/passport/download\"><button type=\"submit\">Descargar pasaporte</button></form><script>\n\t\t\tfunction toggleFields() {\n\t\t\t\tconst isIntern = document.getElementById('intern').checked;\n\t\t\t\tdocument.getElementById('intern-fields').style.display = isIntern ? 'block' : 'none';\n\t\t\t\tdocument.getElementById('external-fields').style.display = isIntern ? 'none' : 'block';\n\t\t\t}\n\n\t\t\tdocument.addEventListener(\"DOMContentLoaded\", toggleFields);\n\t\t</script></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func InternFields() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var2 == nil {
+			templ_7745c5c3_Var2 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<label for=\"grade\">Grado</label> <input type=\"text\" name=\"grade\" id=\"grade\" required> <label for=\"class_group\">Grupo</label> <input type=\"text\" name=\"class_group\" id=\"class_group\" required>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ExternalFields() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<label for=\"personal_id\">ID Personal</label> <input type=\"text\" name=\"personal_id\" id=\"personal_id\" required>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func CollaboratorsList(users []db.User) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		for _, u := range users {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if u.PersonalID != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<p>Externo</p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<p>Interno</p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(u.MiddleNames)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/organization.templ`, Line: 84, Col: 21}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(u.PaternalSurname)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/organization.templ`, Line: 84, Col: 43}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(u.MaternalSurname)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/organization.templ`, Line: 84, Col: 65}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</p></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		return nil
 	})

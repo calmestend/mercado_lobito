@@ -1,17 +1,24 @@
 package views
 
 templ Settings(imgSrc, businessName, businessType, description string) {
-<form id="settings_form" hx-post="/api/profile/config" hx-target="#settings-messages" hx-swap="innerHTML"
-	hx-encoding="multipart/form-data">
-	<img width="84" src={imgSrc} />
-	<br>
-	<div id="settings-messages"></div>
-	<label for="business_name">Nombre (empresa)</label>
-	<input type="text" name="business_name" id="business_name" value={businessName} />
-	<label for="business_type">Tipo de Empresa</label>
-	<input type="text" name="business_type" id="business_type" value={businessType} />
-	<label for="description">Descripción Rápida</label>
-	<input type="text" name="description" id="description" value={description} />
-	<button type="submit">Guardar Cambios</button>
-</form>
+	<form id="settings_form" hx-post="/api/profile/config" hx-target="#settings-messages" hx-swap="innerHTML">
+		<img width="84" src={ imgSrc }/>
+		<br/>
+		<div id="settings-messages"></div>
+		<label for="business_name">Nombre (empresa)</label>
+		<input type="text" name="business_name" id="business_name" value={ businessName }/>
+		<label for="business_type">Tipo de Empresa</label>
+		<select name="business_type" id="business_type">
+			if (businessType == "") {
+				<option value="" selected?={ businessType == "" }>Selecciona una opción</option>
+			}
+			<option value="servicios" selected?={ businessType == "servicios" }>Servicios</option>
+			<option value="alimentos-y-bebidas" selected?={ businessType == "alimentos-y-bebidas" }>Alimentos y Bebidas</option>
+			<option value="ropa-y-accesorios" selected?={ businessType == "ropa-y-accesorios" }>Ropa y Accesorios</option>
+			<option value="otros" selected?={ businessType == "otros" }>Otros</option>
+		</select>
+		<label for="description">Descripción Rápida</label>
+		<input type="text" name="description" id="description" value={ description }/>
+		<button type="submit">Guardar Cambios</button>
+	</form>
 }

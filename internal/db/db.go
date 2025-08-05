@@ -44,12 +44,15 @@ func Init() *sql.DB {
 
 	log.Print("Connected to DB successfully")
 
-	createSchema(db)
+	err = createSchema(db)
+	if err != nil {
+		log.Fatalf("Error %s when creating scheme in DB\n", err)
+	}
 
 	return db
 }
 
-// TODO: Add unique and validations
+// Create Database Scheme
 func createSchema(db *sql.DB) error {
 	tables := []string{
 		`

@@ -1,22 +1,134 @@
 package views
 
+import "github.com/calmestend/mercado_lobito/internal/db"
+import "strconv"
+
 templ Products() {
-	<table>
-		<tr>
-			<th>ID</th>
-			<th>Nombre</th>
-			<th>Precio</th>
-			<th>Stock</th>
-			<th>Accion</th>
-		</tr>
-		<tr>
-			<td>1</td>
-			<td>Nombre Test</td>
-			<td>25.99</td>
-			<td>12</td>
-			<td>Editar</td>
-			<td>Borrar</td>
-		</tr>
-		<p>Total: <span>12</span></p>
+	<div>
+		<h2>Productos</h2>
+		<div>
+			<h3>Crear Producto</h3>
+			<form hx-post="/api/products" hx-target="#products-table" hx-swap="outerHTML">
+				<input type="text" name="title" placeholder="Nombre del producto" required/>
+				<input type="number" step="0.01" name="price" placeholder="Precio" required/>
+				<input type="number" name="stock" placeholder="Stock" required/>
+				<button type="submit">Crear Producto</button>
+			</form>
+		</div>
+		<div id="products-table" hx-get="/api/products" hx-trigger="load"></div>
+		<script>
+			function submitEdit(id) {
+				const row = document.getElementById("product-" + id);
+				const title = row.querySelector('input[name="title"]').value;
+				const price = row.querySelector('input[name="price"]').value;
+				const stock = row.querySelector('input[name="stock"]').value;
+
+				const formData = new FormData();
+				formData.append("id", id);
+				formData.append("title", title);
+				formData.append("price", price);
+				formData.append("stock", stock);
+
+				fetch("/api/products", {
+					method: "PATCH",
+					body: formData,
+					headers: {
+						"HX-Request": "true"
+					}
+				})
+				.then(response => response.text())
+				.then(html => {
+					row.outerHTML = html;
+				})
+				.catch(err => {
+					alert("Error actualizando producto");
+					console.error(err);
+				});
+			}
+		</script>
+	</div>
+}
+
+templ ProductsTable(products []db.Product) {
+	<table id="products-table">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Nombre</th>
+				<th>Precio</th>
+				<th>Stock</th>
+				<th>Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			if len(products) == 0 {
+				<tr>
+					<td colspan="5">No hay productos</td>
+				</tr>
+			} else {
+				for _, product := range products {
+					@ProductRow(product)
+				}
+			}
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="4"><strong>Total productos:</strong></td>
+				<td><strong>{ strconv.Itoa(len(products)) }</strong></td>
+			</tr>
+		</tfoot>
 	</table>
+}
+
+templ ProductRow(product db.Product) {
+	<tr id={ "product-" + strconv.Itoa(product.ID) }>
+		<td>{ strconv.Itoa(product.ID) }</td>
+		<td>{ product.Title }</td>
+		<td>${ strconv.FormatFloat(product.Price, 'f', 2, 64) }</td>
+		<td>{ strconv.Itoa(product.Stock) }</td>
+		<td>
+			<button
+				hx-get={ "/api/products/edit/" + strconv.Itoa(product.ID) }
+				hx-target={ "#product-" + strconv.Itoa(product.ID) }
+				hx-swap="outerHTML"
+			>Editar</button>
+			<button
+				hx-delete="/api/products"
+				hx-target={ "#product-" + strconv.Itoa(product.ID) }
+				hx-swap="outerHTML"
+				hx-vals={ `{"id": "` + strconv.Itoa(product.ID) + `"}` }
+				hx-confirm="¿Estás seguro de eliminar este producto?"
+			>Borrar</button>
+		</td>
+	</tr>
+}
+
+templ ProductEditRow(product db.Product) {
+	<tr id={ "product-" + strconv.Itoa(product.ID) }>
+		<td>{ strconv.Itoa(product.ID) }</td>
+		<td>
+			<input type="text" name="title" value={ product.Title } required/>
+		</td>
+		<td>
+			<input type="number" step="0.01" name="price" value={ strconv.FormatFloat(product.Price, 'f', 2, 64) } required/>
+		</td>
+		<td>
+			<input type="number" name="stock" value={ strconv.Itoa(product.Stock) } required/>
+		</td>
+		<td>
+			<button onclick={ "submitEdit(" + strconv.Itoa(product.ID) + ")" }>Guardar</button>
+			<button
+				type="button"
+				hx-get={ "/api/products/cancel/" + strconv.Itoa(product.ID) }
+				hx-target={ "#product-" + strconv.Itoa(product.ID) }
+				hx-swap="outerHTML"
+			>Cancelar</button>
+		</td>
+	</tr>
+}
+
+templ ProductDeleted() {
+	<tr>
+		<td colspan="5" style="color: green; text-align: center;">Producto eliminado exitosamente</td>
+	</tr>
 }

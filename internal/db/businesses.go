@@ -70,6 +70,43 @@ func (b *Business) GetByOwnerID(db *sql.DB) error {
 	return nil
 }
 
+func (b *Business) GetProductsByOwnerID(db *sql.DB) ([]Product, error) {
+	stmt := `
+		SELECT p.id, p.title, p.price, p.stock, p.business_id
+		FROM products p
+		INNER JOIN businesses b ON p.business_id = b.id
+		WHERE b.owner_id = ?
+	`
+
+	rows, err := db.Query(stmt, b.OwnerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []Product
+	for rows.Next() {
+		var product Product
+		err := rows.Scan(&product.ID, &product.Title, &product.Price, &product.Stock, &product.BusinessID)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
+
+func (b *Business) Delete(db *sql.DB) error {
+	stmt := `DELETE FROM businesses WHERE id = ?`
+	_, err := db.Exec(stmt, b.ID)
+	return err
+}
+
 func (b *Business) Update(db *sql.DB) error {
 	stmt := `
 		UPDATE businesses
@@ -77,11 +114,5 @@ func (b *Business) Update(db *sql.DB) error {
 		WHERE id = ?
 	`
 	_, err := db.Exec(stmt, b.Name, b.Type, b.Description, b.ID)
-	return err
-}
-
-func (b *Business) Delete(db *sql.DB) error {
-	stmt := `DELETE FROM businesses WHERE id = ?`
-	_, err := db.Exec(stmt, b.ID)
 	return err
 }

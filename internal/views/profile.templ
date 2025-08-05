@@ -1,16 +1,16 @@
 package views
 
-templ Profile() {
+templ Profile(fullName string, imgSrc string) {
 	<main>
 		<h2>Bienvenido</h2>
-		<img src="/uploads/matricula.jpg" alt=""/>
-		<p>Username</p>
+		<img width="84" src={ imgSrc }/>
+		<p>{ fullName }</p>
 		<div>
-			<button>Productos</button>
-			<button>Configuraicon</button>
+			<button onclick="window.location.href='/organization/products'">Productos</button>
+			<button onclick="window.location.href='/profile/config'">Configuración</button>
 		</div>
 		<div>
-			<button>Mi Organizacion</button>
+			<button onclick="window.location.href='/organization'">Mi Organización</button>
 		</div>
 	</main>
 	<div>

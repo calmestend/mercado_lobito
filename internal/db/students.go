@@ -46,7 +46,13 @@ func (s *Student) GetByID(db *sql.DB) error {
 }
 
 func (s *Student) Update(db *sql.DB) error {
-	return nil
+	stmt := `
+		UPDATE users
+		SET grade = ?, class_group = ?
+		WHERE id = ?
+	`
+	_, err := db.Exec(stmt, s.Grade, s.ClassGroup, s.ID)
+	return err
 }
 
 func (s *Student) GetByUserID(db *sql.DB) error {
@@ -65,5 +71,7 @@ func (s *Student) GetByUserID(db *sql.DB) error {
 }
 
 func (s *Student) Delete(db *sql.DB) error {
-	return nil
+	stmt := `DELETE FROM students WHERE id = ?`
+	_, err := db.Exec(stmt, s.ID)
+	return err
 }

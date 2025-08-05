@@ -10,7 +10,7 @@ type User struct {
 	MiddleNames     string
 	PaternalSurname string
 	MaternalSurname string
-	PersonalID      int
+	PersonalID      string
 	Email           string
 	Hash            string
 }

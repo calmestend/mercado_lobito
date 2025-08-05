@@ -19,9 +19,33 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func Profile(w http.ResponseWriter, r *http.Request) {
+	dbConn := db.Init()
+	defer dbConn.Close()
+
 	isAuth := auth.IsAuthenticated(r)
 
-	profileComponent := views.Profile()
+	sess, err := auth.GetSessionFromRequest(r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	user := db.User{ID: sess.UserID}
+	if err := user.GetByID(dbConn); err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	student := db.Student{UserID: user.ID}
+	if err := student.GetByUserID(dbConn); err != nil {
+		http.Error(w, "Student not found", http.StatusNotFound)
+		return
+	}
+
+	fullName := fmt.Sprintf("%s %s %s", user.MiddleNames, user.PaternalSurname, user.MaternalSurname)
+	imgSrc := fmt.Sprintf("/uploads/%s.jpg", student.ID)
+
+	profileComponent := views.Profile(fullName, imgSrc)
 	page := views.Index(profileComponent, isAuth)
 	page.Render(r.Context(), w)
 }

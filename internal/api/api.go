@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/calmestend/mercado_lobito/internal/auth"
@@ -20,6 +21,7 @@ func ProfileConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dbConn := db.Init()
+	defer dbConn.Close()
 
 	sess, err := auth.GetSessionFromRequest(r)
 	if err != nil {
@@ -53,6 +55,8 @@ func ProfileConfig(w http.ResponseWriter, r *http.Request) {
 			Description: description,
 			OwnerID:     student.ID,
 		}
+
+		log.Print(business)
 		if err := business.Set(dbConn); err != nil {
 			http.Error(w, "Error creating business", http.StatusInternalServerError)
 			return
@@ -61,8 +65,3 @@ func ProfileConfig(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, `<p style="color:green;">Datos guardados correctamente.</p>`)
 }
-
-func Organization(w http.ResponseWriter, r *http.Request) {
-
-}
-

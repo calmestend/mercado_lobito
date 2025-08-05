@@ -1,41 +1,87 @@
 package views
 
+import "github.com/calmestend/mercado_lobito/internal/db"
+
 templ Organization() {
-<aside>
-	<div>
-		<p>Puesto</p>
-		<p>Nombre</p>
-	</div>
-	<div>
-		<p>Puesto</p>
-		<p>Nombre</p>
-	</div>
-	<div>
-		<p>+</p>
-		<p>Add more colaborators</p>
-	</div>
-</aside>
-<section>
-	<p>Colaborador</p>
-	<img src="matricula.jpg" alt="" />
-	<p>Nombre</p>
-	<button>Interno</button>
-	<button>Externo</button>
-	<div id="messages"></div>
-	<form id="signup_form" hx-post="/organization" hx-target="#messages" hx-swap="innerHTML"
-		hx-encoding="multipart/form-data">
-		<label for="file">Profile Photo</label>
-		<input type="file" accept="image/*" name="file" id="file" />
-		<label for="student_id">Student ID</label>
-		<input type="number" name="student_id" id="student_id" />
-		<label for="middle_names">Names</label>
-		<input type="text" name="middle_names" id="middle_names" />
-		<label for="paternal_surname">Paternal Surname</label>
-		<input type="text" name="paternal_surname" id="paternal_surname" />
-		<label for="maternal_surname">Maternal Surname</label>
-		<input type="text" name="maternal_surname" id="maternal_surname" />
-		<button type="submit">Create/Update Information</button>
-	</form>
-	<button>Download your passport</button>
-</section>
+	<aside>
+		<div id="collaborators-list" hx-get="/api/business/collaborators" hx-trigger="load" hx-swap="innerHTML"></div>
+	</aside>
+	<section>
+		<h2>Nuevo colaborador</h2>
+		<div id="messages"></div>
+		<form
+			id="collaborator-form"
+			hx-post="/api/business/collaborators"
+			hx-target="#messages"
+			hx-swap="innerHTML"
+			hx-encoding="multipart/form-data"
+		>
+			<fieldset>
+				<input type="radio" id="intern" name="isIntern" value="true" required checked onchange="toggleFields()"/>
+				<label for="intern">Interno</label>
+				<input type="radio" id="external" name="isIntern" value="false" onchange="toggleFields()"/>
+				<label for="external">Externo</label>
+			</fieldset>
+			<label for="file">Foto de perfil</label>
+			<input type="file" accept="image/*" name="file" id="file" required/>
+			<label for="middle_names">Nombres</label>
+			<input type="text" name="middle_names" id="middle_names" required/>
+			<label for="paternal_surname">Apellido paterno</label>
+			<input type="text" name="paternal_surname" id="paternal_surname" required/>
+			<label for="maternal_surname">Apellido materno</label>
+			<input type="text" name="maternal_surname" id="maternal_surname" required/>
+			<label for="email">Correo</label>
+			<input type="email" name="email" id="email" required/>
+			<div id="intern-fields">
+				<label for="grade">Grado</label>
+				<input type="text" name="grade" id="grade"/>
+				<label for="class_group">Grupo</label>
+				<input type="text" name="class_group" id="class_group"/>
+				<label for="student_id">Student ID</label>
+				<input type="text" name="student_id" id="student_id"/>
+			</div>
+			<div id="external-fields" style="display: none;">
+				<label for="personal_id">ID Personal</label>
+				<input type="text" name="personal_id" id="personal_id"/>
+			</div>
+			<button type="submit">Crear/Actualizar colaborador</button>
+		</form>
+		<form method="get" action="/passport/download">
+			<button type="submit">Descargar pasaporte</button>
+		</form>
+		<script>
+			function toggleFields() {
+				const isIntern = document.getElementById('intern').checked;
+				document.getElementById('intern-fields').style.display = isIntern ? 'block' : 'none';
+				document.getElementById('external-fields').style.display = isIntern ? 'none' : 'block';
+			}
+
+			document.addEventListener("DOMContentLoaded", toggleFields);
+		</script>
+	</section>
+}
+
+templ InternFields() {
+	<label for="grade">Grado</label>
+	<input type="text" name="grade" id="grade" required/>
+	<label for="class_group">Grupo</label>
+	<input type="text" name="class_group" id="class_group" required/>
+}
+
+templ ExternalFields() {
+	<label for="personal_id">ID Personal</label>
+	<input type="text" name="personal_id" id="personal_id" required/>
+}
+
+templ CollaboratorsList(users []db.User) {
+	for _, u := range users {
+		<div>
+			if u.PersonalID != "" {
+				<p>Externo</p>
+			} else {
+				<p>Interno</p>
+			}
+			<p>{ u.MiddleNames } { u.PaternalSurname } { u.MaternalSurname }</p>
+		</div>
+	}
 }
