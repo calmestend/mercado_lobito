@@ -10,7 +10,6 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/calmestend/mercado_lobito/internal/db"
 import "strconv"
-import "fmt"
 
 func Products() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -33,7 +32,7 @@ func Products() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div><h2>Productos</h2><div><h3>Crear Producto</h3><form hx-post=\"/api/products\" hx-target=\"#products-table\" hx-swap=\"outerHTML\"><input type=\"text\" name=\"title\" placeholder=\"Nombre del producto\" required> <input type=\"number\" step=\"0.01\" name=\"price\" placeholder=\"Precio\" required> <input type=\"number\" name=\"stock\" placeholder=\"Stock\" required> <button type=\"submit\">Crear Producto</button></form></div><div id=\"products-table\" hx-get=\"/api/products\" hx-trigger=\"load\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div><h2>Productos</h2><div><h3>Crear Producto</h3><form hx-post=\"/api/products\" hx-target=\"#products-table\" hx-swap=\"outerHTML\"><input type=\"text\" name=\"title\" placeholder=\"Nombre del producto\" required> <input type=\"number\" step=\"0.01\" name=\"price\" placeholder=\"Precio\" required> <input type=\"number\" name=\"stock\" placeholder=\"Stock\" required> <button type=\"submit\">Crear Producto</button></form></div><div id=\"products-table\" hx-get=\"/api/products\" hx-trigger=\"load\"></div><script>\n\t\t\tfunction submitEdit(id) {\n\t\t\t\tconst row = document.getElementById(\"product-\" + id);\n\t\t\t\tconst title = row.querySelector('input[name=\"title\"]').value;\n\t\t\t\tconst price = row.querySelector('input[name=\"price\"]').value;\n\t\t\t\tconst stock = row.querySelector('input[name=\"stock\"]').value;\n\n\t\t\t\tconst formData = new FormData();\n\t\t\t\tformData.append(\"id\", id);\n\t\t\t\tformData.append(\"title\", title);\n\t\t\t\tformData.append(\"price\", price);\n\t\t\t\tformData.append(\"stock\", stock);\n\n\t\t\t\tfetch(\"/api/products\", {\n\t\t\t\t\tmethod: \"PATCH\",\n\t\t\t\t\tbody: formData,\n\t\t\t\t\theaders: {\n\t\t\t\t\t\t\"HX-Request\": \"true\"\n\t\t\t\t\t}\n\t\t\t\t})\n\t\t\t\t.then(response => response.text())\n\t\t\t\t.then(html => {\n\t\t\t\t\trow.outerHTML = html;\n\t\t\t\t})\n\t\t\t\t.catch(err => {\n\t\t\t\t\talert(\"Error actualizando producto\");\n\t\t\t\t\tconsole.error(err);\n\t\t\t\t});\n\t\t\t}\n\t\t</script></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -86,7 +85,7 @@ func ProductsTable(products []db.Product) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(len(products)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 48, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 77, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -128,7 +127,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs("product-" + strconv.Itoa(product.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 55, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 84, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -141,7 +140,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(product.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 56, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 85, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -154,7 +153,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(product.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 57, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 86, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -167,7 +166,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(product.Price, 'f', 2, 64))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 58, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 87, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -180,7 +179,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(product.Stock))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 59, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 88, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -193,7 +192,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/api/products/edit/" + strconv.Itoa(product.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 62, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 91, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -206,7 +205,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("#product-" + strconv.Itoa(product.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 63, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 92, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -219,7 +218,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs("#product-" + strconv.Itoa(product.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 68, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 97, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -232,7 +231,7 @@ func ProductRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(`{"id": "` + strconv.Itoa(product.ID) + `"}`)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 70, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 99, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -274,7 +273,7 @@ func ProductEditRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs("product-" + strconv.Itoa(product.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 78, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 107, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -287,7 +286,7 @@ func ProductEditRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(product.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 79, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 108, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -300,7 +299,7 @@ func ProductEditRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(product.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 81, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 110, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -313,7 +312,7 @@ func ProductEditRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(product.Price, 'f', 2, 64))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 84, Col: 103}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 113, Col: 103}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -326,56 +325,39 @@ func ProductEditRow(product db.Product) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(product.Stock))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 87, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 116, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" required></td><td>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" required></td><td><button type=\"button\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, fmt.Sprintf("submitEdit('%d')", product.ID))
+		var templ_7745c5c3_Var20 string
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs("/api/products/cancel/" + strconv.Itoa(product.ID))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 121, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<button onclick=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var20 templ.ComponentScript = fmt.Sprintf("submitEdit('%d')", product.ID)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20.Call)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\">Guardar</button> <button type=\"button\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" hx-target=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs("/api/products/cancel/" + strconv.Itoa(product.ID))
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs("#product-" + strconv.Itoa(product.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 93, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 122, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs("#product-" + strconv.Itoa(product.ID))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/products.templ`, Line: 94, Col: 54}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" hx-swap=\"outerHTML\">Cancelar</button></td></tr><script>\n\t\tfunction submitEdit(id) {\n\t\t\tconst row = document.getElementById(\"product-\" + id);\n\t\t\tconst title = row.querySelector('input[name=\"title\"]').value;\n\t\t\tconst price = row.querySelector('input[name=\"price\"]').value;\n\t\t\tconst stock = row.querySelector('input[name=\"stock\"]').value;\n\n\t\t\tconst formData = new FormData();\n\t\t\tformData.append(\"id\", id);\n\t\t\tformData.append(\"title\", title);\n\t\t\tformData.append(\"price\", price);\n\t\t\tformData.append(\"stock\", stock);\n\n\t\t\tfetch(\"/api/products\", {\n\t\t\t\tmethod: \"PATCH\",\n\t\t\t\tbody: formData,\n\t\t\t\theaders: {\n\t\t\t\t\t\"HX-Request\": \"true\"\n\t\t\t\t}\n\t\t\t})\n\t\t\t.then(response => response.text())\n\t\t\t.then(html => {\n\t\t\t\trow.outerHTML = html;\n\t\t\t})\n\t\t\t.catch(err => {\n\t\t\t\talert(\"Error actualizando producto\");\n\t\t\t\tconsole.error(err);\n\t\t\t});\n\t\t}\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" hx-swap=\"outerHTML\">Cancelar</button></td></tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -399,12 +381,12 @@ func ProductDeleted() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var23 == nil {
-			templ_7745c5c3_Var23 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<tr><td colspan=\"5\" style=\"color: green; text-align: center;\">Producto eliminado exitosamente</td></tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<tr><td colspan=\"5\" style=\"color: green; text-align: center;\">Producto eliminado exitosamente</td></tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

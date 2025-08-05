@@ -116,7 +116,6 @@ templ ProductEditRow(product db.Product) {
 			<input type="number" name="stock" value={ strconv.Itoa(product.Stock) } required/>
 		</td>
 		<td>
-			<button onclick={ "submitEdit(" + strconv.Itoa(product.ID) + ")" }>Guardar</button>
 			<button
 				type="button"
 				hx-get={ "/api/products/cancel/" + strconv.Itoa(product.ID) }
