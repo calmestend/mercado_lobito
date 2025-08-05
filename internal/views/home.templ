@@ -1,10 +1,106 @@
 package views
 
 templ Home() {
-	<hero>
-		<p>Carrousel</p>
-	</hero>
-	<article>
-		<h2>Welcome</h2>
-	</article>
+	<div class="carousel-container">
+    <div class="carousel" id="carousel">
+      <div class="carousel-item">
+        <img src="/img/img1.jpeg" alt="imagen carrusel 1">
+      </div>
+      <div class="carousel-item">
+        <img src="/img/img2.jpeg" alt="imagen carrusel 2">
+      </div>
+      <div class="carousel-item">
+        <img src="/img/img3.jpeg" alt="imagen carrusel 3">
+      </div>
+      <div class="carousel-item">
+        <img src="/img/img4.jpeg" alt="imagen carrusel 4">
+      </div>
+      <div class="carousel-item">
+        <img src="/img/img5.jpeg" alt="imagen carrusel 5">
+      </div>
+      <div class="carousel-item">
+        <img src="/img/img6.jpeg" alt="imagen carrusel 6">
+      </div>
+    </div>
+
+    <button class="carousel-button carousel-button-prev" id="prev">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6" />
+      </svg>
+    </button>
+
+    <button class="carousel-button carousel-button-next" id="next">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </button>
+
+    <div class="indicators" id="indicators"></div>
+  </div>
+<script>
+const carousel = document.getElementById('carousel')
+const prevBtn = document.getElementById('prev') 
+const nextBtn = document.getElementById('next') 
+const indicators = document.getElementById('indicators')
+
+let currentIndex = 0
+const items = document.querySelectorAll('.carousel-item')
+const totalItems = items.length
+
+// Crear indicadores
+for(let i = 0; i < totalItems; i++){
+  const dot = document.createElement('div')
+  dot.classList.add('indicator')
+  if (i === 0) dot.classList.add('active')
+  dot.addEventListener('click', () => goToSlide(i))
+  indicators.appendChild(dot) 
 }
+
+function updateIndicators(){
+  document.querySelectorAll('.indicator').forEach((indicator, index) => { 
+    indicator.classList.toggle('active', index === currentIndex) 
+  })
+}
+
+function goToSlide(index){ 
+  currentIndex = index
+  carousel.style.transform = `translateX(-${currentIndex * 100}%)`
+  updateIndicators() 
+}
+
+function nextSlide(){
+  currentIndex = (currentIndex + 1) % totalItems
+  goToSlide(currentIndex)
+}
+
+function prevSlide(){
+  currentIndex = (currentIndex - 1 + totalItems) % totalItems 
+  goToSlide(currentIndex)
+}
+
+
+nextBtn.addEventListener('click', nextSlide)
+prevBtn.addEventListener('click', prevSlide)
+
+
+setInterval(nextSlide, 9000) // Cambia de imagen cada 9 segundos
+</script>
+
+
+<section class="info-section">
+    <div class="info-container">
+      <div class="info-text">
+        <p>Descarga nuestro catálogo de productos.</p>
+      </div>
+      <div class="info-button">
+        <a href="emprendedores.html" class="download-btn">
+          <img src="img/download.png" alt="Download Icon">
+          <span>Download</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+	}

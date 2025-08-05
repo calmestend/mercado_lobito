@@ -34,12 +34,12 @@ func Navbar(isAuth bool) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if !isAuth {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<ul><a href=\"/\">Home</a> <a href=\"/auth/login\">Login</a> <a href=\"/auth/register\">Register</a></ul>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<ul><header class=\"header\"><div class=\"logo\"><img src=\"/img/logo-oscuro.png\" alt=\"logo_utc\"> <img src=\"/img/Lobitos.png\" alt=\"logo_lobitos\"><div class=\"logo-text\"><h2>Mercado Lobitos UTC</h2><p>\"Emprendimiento con garra\"</p></div></div><nav><ul class=\"nav-links\"><li><a href=\"/\">Inicio</a></li></ul></nav><div class=\"btn\"><span class=\"btn-text\">¿Eres Emprendedor?</span><div class=\"buttons-container\"><a href=\"/auth/login\" class=\"btn-login\">Iniciar Sesión</a> <a href=\"/auth/register\" class=\"btn-register\">Registrarse</a></div></div></header></ul>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<ul><a href=\"/profile\">Profile</a> <a href=\"/auth/logout\">Logout</a></ul>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<ul><header class=\"header\"><div class=\"logo\"><img src=\"/img/logo-oscuro.png\" alt=\"logo_utc\"> <img src=\"/img/Lobitos.png\" alt=\"logo_lobitos\"><div class=\"logo-text\"><h2>Mercado Lobitos UTC</h2><p>\"Emprendimiento con garra\"</p></div></div><nav><ul class=\"nav-links\"><li><a href=\"/profile\">Ver Perfil</a></li></ul></nav><div class=\"btn\"><div class=\"buttons-container\"><a href=\"/\" class=\"btn-login\">Ir a Homepage</a> <a href=\"/auth/logout\" class=\"btn-register\">Cerrar Sesion</a></div></div></header></ul>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

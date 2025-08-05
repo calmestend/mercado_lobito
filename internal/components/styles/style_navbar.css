@@ -1,0 +1,139 @@
+.header {
+  background-color: #251538;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 135px;
+  padding: 5px 10%;
+}
+
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+}
+
+.header .logo img {
+  height: 90px;
+  width: auto;
+  transition: all 0.3s;
+}
+
+.header .logo img:hover {
+  transform: scale(1.2);
+}
+
+.header .logo .logo-text {
+  display: flex;
+  flex-direction: column;
+  color: #D8C7F3;
+}
+
+.header .logo .logo-text h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.header .logo .logo-text p {
+  font-size: 12px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.2;
+  font-style: italic;
+}
+
+.header .nav-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+.header .nav-links li {
+  display: inline-block;
+  padding: 0 40px;
+}
+
+.header .nav-links li:hover {
+  transform: scale(1.1);
+}
+
+.header .nav-links a {
+  font-size: 700;
+  color: #D8C7F3;
+  text-decoration: none;
+}
+
+.header .nav-links li a:hover {
+  color: #A385DF;
+}
+
+/* Contenedor de los botones con texto arriba */
+.header .btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Texto arriba de los botones */
+.header .btn .btn-text {
+  font-size: 17px;
+  font-weight: 500;
+  color: #D8C7F3;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Contenedor de los botones*/
+.header .btn .buttons-container {
+  display: flex;
+  background: #D8C7F3;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+/* Estilo base para los botones */
+.header .btn button {
+  font-weight: 700;
+  padding: 12px 30px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease 0s;
+  font-size: 16px;
+}
+
+/* Botón de iniciar sesión*/
+.header .btn .btn-login {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #A385DF;
+  color: #FFFFFF;
+  text-decoration: none;
+  cursor: pointer;
+  background: #A385DF;
+  border-radius: 50px 0 0 50px;
+}
+
+.header .btn .btn-login:hover {
+  transform: scale(1.05);
+}
+
+/* Botón de registro*/
+.header .btn .btn-register {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #D8C7F3;
+  border: none;
+  text-decoration: none;
+  color: #9B82D7;
+  cursor: pointer;
+  background: #D8C7F3;
+  border-radius: 0 50px 50px 0;
+}
+
+.header .btn .btn-register:hover {
+  transform: scale(1.05);
+}

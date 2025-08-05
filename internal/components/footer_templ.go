@@ -29,7 +29,7 @@ func Footer() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<footer><p>Mercado lobito 2025</p></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<footer><footer class=\"footer\"><div class=\"footer-content\"><div class=\"footer-left\"><img src=\"/img/Lobitos.png\" alt=\"Logo\" class=\"logo\"><div class=\"contact-info\"><p>Dirección: Carretera Estatal 413–Km. 11.2, Santa Bárbara, 76924 Corregidora, Qro.</p><p>Teléfono: 442 482 0070</p></div></div><div class=\"footer-right\"><a href=\"#\">Políticas de Privacidad</a> | <a href=\"#\">Créditos de Desarrollo</a> | <a href=\"#\">Dudas o sugerencias</a></div></div></footer></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -192,7 +192,6 @@ func cancelEditProduct(w http.ResponseWriter, r *http.Request) {
 	component.Render(r.Context(), w)
 }
 
-// @FIX: Edit
 func updateProduct(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Error parsing form", http.StatusBadRequest)
@@ -201,6 +200,13 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 
 	dbConn := db.Init()
 	defer dbConn.Close()
+
+	// Get session to verify ownership
+	sess, err := auth.GetSessionFromRequest(r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	id := r.FormValue("id")
 	title := r.FormValue("title")
@@ -225,11 +231,35 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	student := db.Student{UserID: sess.UserID}
+	if err := student.GetByUserID(dbConn); err != nil {
+		http.Error(w, "Student not found", http.StatusNotFound)
+		return
+	}
+
+	business := db.Business{OwnerID: student.ID}
+	if err := business.GetByOwnerID(dbConn); err != nil {
+		http.Error(w, "Business not found", http.StatusNotFound)
+		return
+	}
+
+	existingProduct := db.Product{ID: idInt}
+	if err := existingProduct.GetByID(dbConn); err != nil {
+		http.Error(w, "Product not found", http.StatusNotFound)
+		return
+	}
+
+	if existingProduct.BusinessID != business.ID {
+		http.Error(w, "Unauthorized to edit this product", http.StatusForbidden)
+		return
+	}
+
 	product := db.Product{
-		ID:    idInt,
-		Title: title,
-		Price: priceFloat,
-		Stock: stockInt,
+		ID:         idInt,
+		Title:      title,
+		Price:      priceFloat,
+		Stock:      stockInt,
+		BusinessID: business.ID,
 	}
 
 	err = product.Update(dbConn)

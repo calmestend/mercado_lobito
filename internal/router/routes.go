@@ -23,6 +23,10 @@ func Init() {
 	http.HandleFunc("/auth/login", handlers.Login)
 	http.HandleFunc("/auth/register", handlers.Register)
 
+	// Expose img directory
+	fs := http.FileServer(http.Dir("./internal/img"))
+	http.Handle("/img/", http.StripPrefix("/img/", fs))
+
 	// Expose Upload directory
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
@@ -30,9 +34,11 @@ func Init() {
 	http.HandleFunc("/auth/signin", auth.Signin)
 	http.HandleFunc("/auth/signup", auth.Signup)
 	http.HandleFunc("/auth/logout", auth.Logout)
-	http.HandleFunc("/api/profile/config", api.ProfileConfig)
-	http.HandleFunc("/api/business/collaborators", api.BusinessCollaborators)
-	http.HandleFunc("/api/products", api.Products)
+	http.HandleFunc("/api/profile/config", auth.AuthMiddleware(api.ProfileConfig))
+	http.HandleFunc("/api/business/collaborators", auth.AuthMiddleware(api.BusinessCollaborators))
+	http.HandleFunc("/api/products/edit/", auth.AuthMiddleware(api.Products))
+	http.HandleFunc("/api/products/cancel/", auth.AuthMiddleware(api.Products))
+	http.HandleFunc("/api/products", auth.AuthMiddleware(api.Products))
 
 	http.ListenAndServe(":3030", nil)
 }

@@ -16,36 +16,6 @@ templ Products() {
 			</form>
 		</div>
 		<div id="products-table" hx-get="/api/products" hx-trigger="load"></div>
-		<script>
-			function submitEdit(id) {
-				const row = document.getElementById("product-" + id);
-				const title = row.querySelector('input[name="title"]').value;
-				const price = row.querySelector('input[name="price"]').value;
-				const stock = row.querySelector('input[name="stock"]').value;
-
-				const formData = new FormData();
-				formData.append("id", id);
-				formData.append("title", title);
-				formData.append("price", price);
-				formData.append("stock", stock);
-
-				fetch("/api/products", {
-					method: "PATCH",
-					body: formData,
-					headers: {
-						"HX-Request": "true"
-					}
-				})
-				.then(response => response.text())
-				.then(html => {
-					row.outerHTML = html;
-				})
-				.catch(err => {
-					alert("Error actualizando producto");
-					console.error(err);
-				});
-			}
-		</script>
 	</div>
 }
 
@@ -116,6 +86,14 @@ templ ProductEditRow(product db.Product) {
 			<input type="number" name="stock" value={ strconv.Itoa(product.Stock) } required/>
 		</td>
 		<td>
+			<button
+				type="button"
+				hx-patch="/api/products"
+				hx-target={ "#product-" + strconv.Itoa(product.ID) }
+				hx-swap="outerHTML"
+				hx-include={ "#product-" + strconv.Itoa(product.ID) + " input" }
+				hx-vals={ `{"id": "` + strconv.Itoa(product.ID) + `"}` }
+			>Guardar</button>
 			<button
 				type="button"
 				hx-get={ "/api/products/cancel/" + strconv.Itoa(product.ID) }
